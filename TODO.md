@@ -1,6 +1,5 @@
 # TODO
 
-- [ ] Finish writing Reducer 
 - [ ] Test the entire flow
 - [ ] Finish the first Raw Database Writer (raw ad clicks)
 - [ ] Finish the second Database Writer (top ad clicks)
@@ -16,3 +15,4 @@
 - [x] See if modules are making sense within the project (utils)
 - [x] Test again the whole process
 - [x] Try using MaxHeap to improve data aggregation and sorting in Aggregators
+- [x] Finish writing Reducer 

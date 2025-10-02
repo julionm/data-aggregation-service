@@ -24,9 +24,12 @@ initial_time = datetime.now()
 data = Counter()
 
 def sort_and_send_rank():
-    top_n_ads = data.most_common()
+    top_n_ads = data.most_common(TOP_N_ADS)
 
-    pass
+    channel2.basic_publish(
+        routing_key='red-top-ad-clicks',
+        body=json.dumps(top_n_ads).encode('utf-8')
+    )
 
 def message_handler(ch, method, properties, body):
     payload = json.loads(body)

@@ -1,0 +1,7 @@
+service AggregateNode {
+    rpc AggregateAdClicks (AdClick) returns () {}
+}
+
+message AdClick {
+    
+}

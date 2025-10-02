@@ -1,0 +1,1 @@
+-- generic sql script used for querying from database

@@ -22,6 +22,8 @@ config = {
 
 producer = Producer(config)
 
+print('[INFO] Application started.')
+
 ad_ids = list(range(1, 51))
 
 for _ in range(200):
@@ -40,12 +42,12 @@ for _ in range(200):
     )
 
     # logging for test purposes
-    # print(f'{created_at} [INFO] New event produced for ad_id: {ad_id}')
+    print(f'{created_at} [INFO] New event produced for ad_id: {ad_id}')
 
     # poll is used to ensure the message was delivered, we can call it everytime we send a message
     # but I believe, that in my use-case I can just ignore this
     # producer.poll(20)
 
-    sleep(1)
+    sleep(2)
     
 producer.flush()

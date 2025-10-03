@@ -6,16 +6,13 @@ from datetime import datetime
 from utils import MyKafkaConsumer
 from collections import Counter
 
-# TODO Validate this Script again
-# TODO Try to apply MaxHeap here
-
 class Queue():
     def __init__(self):
         queue_conn = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
         self.queue_channel = queue_conn.channel()
         self.queue_channel.queue_declare(
             queue="agg-top-ad-clicks",
-            durable=True,
+            durable=False,
         )
     
     def send(self, data: dict):
@@ -47,15 +44,17 @@ class Aggregator():
         self.initial_time = datetime.now().replace(second=0)
 
     def __handle_aggregation(self):
-        top_n_ads = map(
+        top_n_ads = list(map(
             lambda item: { 'id': item[0], 'count': item[1] },
-            Counter.most_common(self.TOP_N_ADS)
-        )
+            self.data.most_common(self.TOP_N_ADS)
+        ))
         
         payload = {
-            "created_at": f'{self.initial_time}',
+            "created_at": f'{self.initial_time.replace(microsecond=0).isoformat()}',
             'data': top_n_ads
         }
+
+        print('[INFO] Sending aggregated data.')
 
         self.queue.send(payload)
         self.data = Counter()
@@ -70,6 +69,7 @@ class Aggregator():
         # getting a created_at that has only date, hour and minute
         # because the aggregation time is 1 minute
         created_at = datetime.strptime(payload['created_at'], "%Y-%m-%dT%H:%M:%S").replace(second=0)
+        print(f'[INFO] Received new message ID: {ad_id}.')
 
         # In order for this to work, I need to test:
         # 1. Is the new date lesser than the initial? Then discard this

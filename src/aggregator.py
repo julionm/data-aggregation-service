@@ -85,7 +85,7 @@ class Aggregator():
             self.initial_time = created_at
         
         ad_agg_id = f'ad_click{ad_id}'
-        self.data.update(ad_agg_id)
+        self.data.update([ad_agg_id])
     
     def process(self):
         msg = self.kafka_consumer.poll()

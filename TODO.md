@@ -1,6 +1,5 @@
 # TODO
 
-- [ ] Refactor Reducer
 - [ ] Finish the first Raw Database Writer (raw ad clicks)
 - [ ] Finish the second Database Writer (top ad clicks)
 - [ ] Decide between polling or batching for the Aggregator
@@ -19,3 +18,4 @@
 - [x] Try using MaxHeap to improve data aggregation and sorting in Aggregators
 - [x] Finish writing Reducer 
 - [x] Test the entire flow
+- [x] Refactor Reducer

@@ -3,84 +3,88 @@ import json
 from datetime import datetime
 from collections import Counter
 
-# ! This is not parsing correctly into Counter
-# TODO transform this into a class Reducer
+class Reducer():
 
-# this should be available for both systems (agg, red)
-TOP_N_ADS = 10 
+    def __init__(self):
+        # this should be available for both systems (agg, red)
+        self.TOP_N_ADS = 10
 
-conn2 = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
-channel2 = conn2.channel()
+        receive_conn = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+        self.receive_channel = receive_conn.channel()
+        self.receive_channel.queue_declare(
+            queue="agg-top-ad-clicks"
+        )
 
-channel2.queue_declare(
-    queue="red-top-ad-clicks"
-)
+        send_conn = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+        self.send_channel = send_conn.channel() 
+        self.send_channel.queue_declare(
+            queue="red-top-ad-clicks"
+        )
 
-conn = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
-channel = conn.channel()
+        self.initial_time = None
+        self.data = Counter()
 
-channel.queue_declare(
-    queue="agg-top-ad-clicks"
-)
+        print('[INFO] Application started.')
 
-initial_time = None
-data = Counter()
+    def sort_and_send_rank(self):
 
-print('[INFO] Application started.')
+        print('[INFO] Aggregated data will be sent to the queue.')
 
-def sort_and_send_rank():
-    global data
+        top_n_ads = self.data.most_common(self.TOP_N_ADS)
 
-    print('[INFO] Aggregated data will be sent to the queue.')
+        self.send_channel.basic_publish(
+            exchange='',
+            routing_key='red-top-ad-clicks',
+            body=json.dumps(top_n_ads).encode('utf-8')
+        )
 
-    top_n_ads = data.most_common(TOP_N_ADS)
+        self.data = Counter()
 
-    channel2.basic_publish(
-        exchange='',
-        routing_key='red-top-ad-clicks',
-        body=json.dumps(top_n_ads).encode('utf-8')
-    )
+    def message_handler(self, ch, method, properties, body):
+        print('[INFO] Received new message.')
 
-    data = Counter()
+        payload = json.loads(body)
 
-def message_handler(ch, method, properties, body):
-    global initial_time, data
-
-    print('[INFO] Received new message.')
-
-    payload = json.loads(body)
-
-    if "created_at" not in payload or "data" not in payload:
-        return
-
-    created_at = datetime.strptime(payload['created_at'], "%Y-%m-%dT%H:%M:%S").replace(second=0)
-
-    if initial_time is None:
-        initial_time = created_at
-
-    if initial_time != created_at:
-        # handle sending to the next queue
-        sort_and_send_rank()
-        initial_time = created_at
-
-    for item in payload['data']:
-        if 'id' not in item or 'count' not in item:
+        if "created_at" not in payload or "data" not in payload:
             return
 
-        data[item['id']] = item['count']
-    
-    print('[INFO] Message processed.')
-    print(f'[INFO] Current Counter: {data}')
+        created_at = datetime.strptime(payload['created_at'], "%Y-%m-%dT%H:%M:%S").replace(second=0)
 
-    # I dont know what a delivery tag is in RabbitMQ
-    ch.basic_ack(delivery_tag=method.delivery_tag)
+        if self.initial_time is None:
+            self.initial_time = created_at
 
-channel.basic_consume(
-    queue='agg-top-ad-clicks',
-    # auto_ack=True,
-    on_message_callback=message_handler
-)
+        if self.initial_time != created_at:
+            # handle sending to the next queue
+            self.sort_and_send_rank()
+            self.initial_time = created_at
 
-print('[INFO] Listening queue: "top-ad-clicks".')
+        print(f'[INFO] Payload: {payload}')
 
-channel.start_consuming()
+        for item in payload['data']:
+            if 'id' not in item or 'count' not in item:
+                return
+            self.data[item['id']] = item['count']
+        
+        print('[INFO] Message processed.')
+        print(f'[INFO] Current Counter: {self.data}')
+
+        # I dont know what a delivery tag is in RabbitMQ
+        ch.basic_ack(delivery_tag=method.delivery_tag)
+
+    def start(self):
+        try:
+            self.receive_channel.basic_consume(
+                queue='agg-top-ad-clicks',
+                # auto_ack=True,
+                on_message_callback=self.message_handler
+            )
+
+            print('[INFO] Listening queue: "top-ad-clicks".')
+
+            self.receive_channel.start_consuming()
+        except Exception as e:
+            print(f'[ERROR] Unexpected error: {e}')
+
+
+reducer = Reducer()
+reducer.start()

@@ -1,3 +1,4 @@
+name: data-aggregation-service
 services:
     db:
         image: postgres

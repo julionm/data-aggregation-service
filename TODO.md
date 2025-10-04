@@ -7,8 +7,8 @@
      - [ ] Create the Logger class
 - [ ] Investigate why sometimes I cannot CTRL + C out of the Aggregator app
 - [ ] Change how we treat times in Agg and Reducer (for now, no better option)
-     - [ ] Answer: What are the downsides of using the way it is today? (ask neto)
-
+     - [ ] What are the downsides of using the way it is today? (ask neto)
+- [ ] Remove static database connection information from scripts
 
 # Done
 

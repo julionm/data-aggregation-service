@@ -26,7 +26,7 @@ print('[INFO] Application started.')
 
 ad_ids = list(range(1, 51))
 
-for _ in range(200):
+for _ in range(10000):
 
     ad_id = choice(ad_ids)
     created_at = datetime.now().replace(microsecond=0).isoformat()
@@ -48,6 +48,6 @@ for _ in range(200):
     # but I believe, that in my use-case I can just ignore this
     # producer.poll(20)
 
-    sleep(2)
+    sleep(0.5)
     
 producer.flush()

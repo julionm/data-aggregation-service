@@ -30,13 +30,23 @@ class Reducer():
 
         print('[INFO] Aggregated data will be sent to the queue.')
 
-        top_n_ads = self.data.most_common(self.TOP_N_ADS)
+        top_n_ads = list(map(
+            lambda item: { 'id': item[0], 'count': item[1] },
+            self.data.most_common(self.TOP_N_ADS)
+        ))
+
+        payload = {
+            "created_at": f'{self.initial_time.replace(microsecond=0).isoformat()}',
+            "data": top_n_ads
+        }
 
         self.send_channel.basic_publish(
             exchange='',
             routing_key='red-top-ad-clicks',
-            body=json.dumps(top_n_ads).encode('utf-8')
+            body=json.dumps(payload).encode('utf-8')
         )
+
+        print('[INFO] Data sent to Database Writer.')
 
         self.data = Counter()
 

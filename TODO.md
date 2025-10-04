@@ -1,8 +1,6 @@
 # TODO
 
-- [ ] Finish the first Raw Database Writer (raw ad clicks)
-     - [ ] Save the full timestamp in this Writer (need to update log-watcher and aggregator)
-- [ ] Finish the second Database Writer (top ad clicks)
+- [ ] Save the full timestamp in the Raw Database Writer (need to update log-watcher and aggregator)
 - [ ] Decide between polling or batching for the Aggregator
 - [ ] Change how we treat times in Agg and Reducer (for now, no better option)
      - [ ] Answer: What are the downsides of using the way it is today?
@@ -20,3 +18,5 @@
 - [x] Finish writing Reducer 
 - [x] Test the entire flow
 - [x] Refactor Reducer
+- [x] Finish the first Raw Database Writer (raw ad clicks)
+- [x] Finish the second Database Writer (top ad clicks)

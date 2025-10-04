@@ -17,3 +17,12 @@ CREATE TABLE IF NOT EXISTS raw.ad_clicks_logs (
     created_at TIMESTAMP,
     FOREIGN KEY (ad_id) REFERENCES public.advertisements (id)
 );
+
+CREATE TABLE IF NOT EXISTS public.top_ad_clicks (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    ad_id BIGINT,
+    clicks BIGINT,
+    agg_time TIMESTAMP,
+    created_at TIMESTAMP,
+    FOREIGN KEY (ad_id) REFERENCES public.advertisements (id)
+);

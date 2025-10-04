@@ -1,6 +1,7 @@
 # TODO
 
 - [ ] Finish the first Raw Database Writer (raw ad clicks)
+     - [ ] Save the full timestamp in this Writer (need to update log-watcher and aggregator)
 - [ ] Finish the second Database Writer (top ad clicks)
 - [ ] Decide between polling or batching for the Aggregator
 - [ ] Change how we treat times in Agg and Reducer (for now, no better option)

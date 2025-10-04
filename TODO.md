@@ -10,7 +10,7 @@
      - [ ] Answer: What are the downsides of using the way it is today? (ask neto)
 
 
-## Done
+# Done
 
 - [x] See if modules are making sense within the project (utils)
 - [x] Test again the whole process
